@@ -118,4 +118,134 @@ app_3_1.xsd"
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
 </web-app>
-  
+    
+    //prac 4c
+    //Index.html:
+<html>
+    <head>
+        <title>Practical 1 C</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <form action="prac1c" method="post">
+            <table cellpadding="1">
+                <thead>
+                    <tr>
+                        <th><b>REGISTRATION FORM</b></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><b>First Name : </b></td>
+                        <td><input type="text" name="fname" value=""></td>
+                    </tr>
+                    <tr>
+                        <td><b>Last Name : </b></td>
+                        <td><input type="text" name="sname" value=""></td>
+                    </tr>
+                    <tr>
+                        <td><b>Zip Code : </b></td>
+                        <td><input type="text" name="zip" value=""></td>
+                    </tr>
+                    <tr>
+                        <td><b>User Name : </b></td>
+                        <td><input type="text" name="uid" value=""></td>
+                    </tr>
+                    <tr>
+                        <td><b>Password : </b></td>
+                        <td><input type="password" name="pwd" value=""></td>
+                    </tr>
+                    <tr>
+                        <td><b>Confirm Password : </b></td>
+                        <td><input type="password" name="pwd1" value=""></td>
+                    </tr>
+                    <tr>
+                        <td><b>Town : </b></td>
+                        <td><input type="text" name="town" value=""></td>
+                    </tr>
+                    <tr>
+                        <td><b>Country : </b></td>
+                        <td><input type="text" name="country" value=""></td>
+                    </tr>
+                    <tr>
+                        <td><input type="submit" value="Submit"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </body>
+</html>
+//Servlet code
+    import java.io.IOException;
+import java.io.PrintWriter;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.sql.*;
+@WebServlet(urlPatterns = {"/prac1c"})
+public class prac1c extends HttpServlet {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        try (PrintWriter out = response.getWriter()) {
+            String connectionURL = "jdbc:mysql://localhost:3306/db";
+            Connection connection = null;
+            ResultSet rs;
+            response.setContentType("text/html;charset=UTF-8");
+            String uid = request.getParameter("uid");
+            String fname = request.getParameter("fname");
+            String sname = request.getParameter("sname");
+            String pwd = request.getParameter("pwd");
+            String pwd1 = request.getParameter("pwd1");
+            String town = request.getParameter("town");
+            String country = request.getParameter("country");
+            String zip = request.getParameter("zip");
+            try {
+                Class.forName("org.gjt.mm.mysql.Driver");
+                connection = DriverManager.getConnection(connectionURL, "root", "root");
+                String sql = "insert into user_register values(?,?,?,?,?,?,?,?)";
+                PreparedStatement pst = connection.prepareStatement(sql);
+                pst.setString(1, uid);
+                pst.setString(2, fname);
+                pst.setString(3, sname);
+                pst.setString(4, pwd);
+                pst.setString(5, pwd1);
+                pst.setString(6, town);
+                pst.setString(7, country);
+                pst.setString(8, zip);
+                int numRowsChanged = pst.executeUpdate();
+                out.println("Welcome : ");
+                out.println("'" + fname + "'");
+                pst.close();
+            } catch (ClassNotFoundException e) {
+                out.println("Couldnt Load database driver : " + e.getMessage());
+            } catch (SQLException e) {
+                out.println("SQL Exception caught : " + e.getMessage());
+            } catch (Exception e) {
+                out.println(e);
+            } finally {
+                try {
+                    if (connection != null) {
+                        connection.close();
+                    }
+                } catch (SQLException ignored) {
+                    out.println(ignored);
+                } }}}}
+
+//Mysql code:
+CREATE DATABASE db;
+USE db;
+CREATE TABLE user_register (
+uid CHAR(40),
+fname CHAR(40),
+sname CHAR(40),
+pwd CHAR(40),
+pwd1 CHAR(40),
+town CHAR(40),
+country CHAR(40),
+zipcode CHAR(40)
+);
+
